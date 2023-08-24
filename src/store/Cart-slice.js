@@ -1,10 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
-
+import { notificationActions } from "./Notification-slice";
 const cartInitialState = {
   isVisible: false,
-  items: [
-   
-  ],
+  items: [],
 };
 
 const cartSlice = createSlice({
@@ -76,6 +74,52 @@ const cartSlice = createSlice({
     },
   },
 });
+
+export const sendCartData = (cartItems) => {
+  return async (dispatch) => {
+
+    dispatch(
+      notificationActions.showNotification({
+        title: "pending",
+        status: "pending",
+        message: "Loading...",
+      })
+    );
+
+    const sendRequest = async () => {
+      const respone = await fetch(
+        "https://task-4792d-default-rtdb.firebaseio.com/cart.json",
+        {
+          method: "PUT",
+          body: JSON.stringify(cartItems),
+        }
+      );
+
+      if (!respone.ok) {
+        throw new Error("Request Was Not Successful");
+      }
+    };
+
+    try {
+      await sendRequest();
+      dispatch(
+        notificationActions.showNotification({
+          title: "success",
+          status: "success",
+          message: "Request Was Successful",
+        })
+      );
+    } catch (error) {
+      dispatch(
+        notificationActions.showNotification({
+          title: "error",
+          status: "error",
+          message: error.message,
+        })
+      );
+    }
+  };
+};
 
 export const cartActions = cartSlice.actions;
 export default cartSlice.reducer;

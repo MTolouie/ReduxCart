@@ -3,9 +3,8 @@ import Cart from "./components/Cart/Cart";
 import Layout from "./components/Layout/Layout";
 import Products from "./components/Shop/Products";
 import { useSelector, useDispatch } from "react-redux";
-import { notificationActions } from "./store/Notification-store";
 import Notification from "./components/UI/Notification";
-
+import {sendCartData} from "./store/Cart-slice";
 let isInitial = true;
 
 function App() {
@@ -19,43 +18,9 @@ function App() {
       isInitial = false;
       return;
     }
-    const sendCartData = async () => {
-      dispatch(
-        notificationActions.showNotification({
-          title: "pending",
-          status: "pending",
-          message: "Loading...",
-        })
-      );
-
-      const respone = await fetch(
-        "https://task-4792d-default-rtdb.firebaseio.com/cart.json",
-        {
-          method: "PUT",
-          body: JSON.stringify(cart.items),
-        }
-      );
-      if (!respone.ok) {
-        throw new Error("Request Was Not Successful");
-      }
-      dispatch(
-        notificationActions.showNotification({
-          title: "success",
-          status: "success",
-          message: "Request Was Successful",
-        })
-      );
-    };
-
-    sendCartData().catch((err) => {
-      dispatch(
-        notificationActions.showNotification({
-          title: "error",
-          status: "error",
-          message: err.message,
-        })
-      );
-    });
+   
+    dispatch(sendCartData(cart.items));
+    
   }, [cart.items, dispatch]);
 
   return (
