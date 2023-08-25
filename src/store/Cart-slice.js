@@ -3,14 +3,14 @@ import { notificationActions } from "./Notification-slice";
 const cartInitialState = {
   isVisible: false,
   items: [],
-  isChanged:false,
+  isChanged: false,
 };
 
 const cartSlice = createSlice({
   name: "cart",
   initialState: cartInitialState,
   reducers: {
-    replaceCart(state,action){
+    replaceCart(state, action) {
       state.items = action.payload.items;
     },
     toggleVisibility(state) {
@@ -83,7 +83,6 @@ const cartSlice = createSlice({
 
 export const sendCartData = (cartItems) => {
   return async (dispatch) => {
-
     dispatch(
       notificationActions.showNotification({
         title: "pending",
@@ -135,7 +134,7 @@ export const fetchCartData = () => {
       );
 
       if (!response.ok) {
-        throw new Error('Could not fetch cart data!');
+        throw new Error("Could not fetch cart data!");
       }
 
       const data = await response.json();
@@ -153,9 +152,9 @@ export const fetchCartData = () => {
     } catch (error) {
       dispatch(
         notificationActions.showNotification({
-          status: 'error',
-          title: 'Error!',
-          message: 'Fetching cart data failed!',
+          status: "error",
+          title: "Error!",
+          message: "Fetching cart data failed!",
         })
       );
     }
