@@ -4,7 +4,7 @@ import Layout from "./components/Layout/Layout";
 import Products from "./components/Shop/Products";
 import { useSelector, useDispatch } from "react-redux";
 import Notification from "./components/UI/Notification";
-import {sendCartData} from "./store/Cart-slice";
+import { fetchCartData, sendCartData } from "./store/Cart-slice";
 let isInitial = true;
 
 function App() {
@@ -14,14 +14,20 @@ function App() {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    dispatch(fetchCartData());
+  }, [dispatch]);
+
+  useEffect(() => {
     if (isInitial) {
       isInitial = false;
       return;
     }
-   
-    dispatch(sendCartData(cart.items));
-    
-  }, [cart.items, dispatch]);
+
+    if(cart.isChanged){
+      dispatch(sendCartData(cart.items));
+    }
+
+  }, [cart.items,cart.isChanged, dispatch]);
 
   return (
     <Fragment>

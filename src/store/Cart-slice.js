@@ -3,12 +3,16 @@ import { notificationActions } from "./Notification-slice";
 const cartInitialState = {
   isVisible: false,
   items: [],
+  isChanged:false,
 };
 
 const cartSlice = createSlice({
   name: "cart",
   initialState: cartInitialState,
   reducers: {
+    replaceCart(state,action){
+      state.items = action.payload.items;
+    },
     toggleVisibility(state) {
       state.isVisible = !state.isVisible;
     },
@@ -24,6 +28,7 @@ const cartSlice = createSlice({
           quantity: existingItem.quantity + 1,
           total: existingItem.price * (existingItem.quantity + 1),
         };
+        state.isChanged = true;
         state.items[existingItemIndex] = updatedItem;
       } else {
         const objToBeAdded = {
@@ -31,6 +36,7 @@ const cartSlice = createSlice({
           id: Math.random(),
           total: action.payload.price,
         };
+        state.isChanged = true;
         state.items.push(objToBeAdded);
       }
     },
@@ -115,6 +121,41 @@ export const sendCartData = (cartItems) => {
           title: "error",
           status: "error",
           message: error.message,
+        })
+      );
+    }
+  };
+};
+
+export const fetchCartData = () => {
+  return async (dispatch) => {
+    const fetchData = async () => {
+      const response = await fetch(
+        "https://task-4792d-default-rtdb.firebaseio.com/cart.json"
+      );
+
+      if (!response.ok) {
+        throw new Error('Could not fetch cart data!');
+      }
+
+      const data = await response.json();
+
+      return data;
+    };
+
+    try {
+      const cartData = await fetchData();
+      dispatch(
+        cartActions.replaceCart({
+          items: cartData.items || [],
+        })
+      );
+    } catch (error) {
+      dispatch(
+        notificationActions.showNotification({
+          status: 'error',
+          title: 'Error!',
+          message: 'Fetching cart data failed!',
         })
       );
     }
